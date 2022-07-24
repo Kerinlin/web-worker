@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>normal</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button onclick="calculate()">计算</button>
+      <button onclick="changeColor()">改变颜色</button>
+      <br />
+      <p class="resultWrap">计算结果为<span class="result"></span></p>
+    </div>
+  </body>
+  <script>
+    let resultEle = document.querySelector(".result");
+    let resultWrapEle = document.querySelector(".resultWrap");
+    let bgEle = document.querySelector(".container");
+    const worker = new Worker("worker.js");
+
+    let isWhite = false;
+    function calculate() {
+      worker.postMessage("calculateSum");
+    }
+    worker.onmessage = (e) => {
+      let action = e.data;
+      if (action?.type === "result") {
+        resultEle.innerHTML = action?.sum;
+      }
+    };
+    
+    function changeColor() {
+      bgEle.style.backgroundColor = "#000";
+      resultWrapEle.style.color = "#fff";
+      isWhite = !isWhite;
+      if (isWhite) {
+        bgEle.style.backgroundColor = "#000";
+        resultWrapEle.style.color = "#fff";
+      } else {
+        bgEle.style.backgroundColor = "#fff";
+        resultWrapEle.style.color = "#000";
+      }
+    }
+  </script>
+</html>

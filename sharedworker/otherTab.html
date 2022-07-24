@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>otherTab</title>
+  </head>
+  <body>
+    <p>当前计算结果为: <span class="result"></span></p>
+    <button onclick="calculate('add',20)">加20</button>
+    <button onclick="calculate('sub',10)">减10</button>
+    <button onclick="calculate('multi',2)">乘2</button>
+    <button onclick="calculate('div',5)">除以5</button>
+    <button onclick="calculate('clear')">清零</button>
+    <button onclick="closePort()">关闭当前端口</button>
+  </body>
+  <script>
+    let shareWorker = new SharedWorker("./shareWorker.js");
+    let port = shareWorker.port;
+    let resultEle = document.querySelector(".result");
+    port.postMessage({type: 'getResult'});
+    port.onmessage = (e) => {
+      let action = e.data;
+      console.log("接收到sharedWorker消息", action);
+      if (action?.type === "result") {
+        resultEle.innerHTML = action.data;
+      }
+    };
+    function calculate(type, data) {
+      port.postMessage({ type, data });
+    }
+    function closePort() {
+      port.postMessage({ type: 'closePort'});
+    }
+  </script>
+</html>

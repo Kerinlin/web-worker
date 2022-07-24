@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shareWorker</title>
+  </head>
+  <body>
+    <p>当前计算结果为: <span class="result"></span></p>
+    <button onclick="openNewTab()">打开新的计算标签页</button>
+  </body>
+  <script>
+    let shareWorker = new SharedWorker("./shareWorker.js");
+    let port = shareWorker.port;
+    let resultEle = document.querySelector(".result");
+    // 获取当前count
+    port.postMessage({type: 'getResult'});
+
+    port.onmessage = (e) => {
+      let action = e.data;
+      console.log('接收到sharedWorker消息',action);
+      if (action?.type === "result") {
+        resultEle.innerHTML = action.data;
+      }
+    };
+    function openNewTab() {
+      window.open("./otherTab.html");
+    }
+  </script>
+</html>
